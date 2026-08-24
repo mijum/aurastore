@@ -28,14 +28,19 @@ authRouter.post('/login', async (req, res) => {
     return fail(res, 'Invalid administrator credentials', 401);
   }
 
+  const accessToken = createAccessToken(admin);
   const placeholderHash = hashToken(`${admin.id}:${Date.now()}:${Math.random()}`);
   const session = await prisma.adminSession.create({
     data: { adminId: admin.id, refreshTokenHash: placeholderHash, expiresAt: new Date(Date.now() + 7 * 86400000) },
   });
   const refreshToken = createRefreshToken(admin, session.id);
   await prisma.adminSession.update({ where: { id: session.id }, data: { refreshTokenHash: hashToken(refreshToken) } });
-  setAuthCookies(res, createAccessToken(admin), refreshToken);
-  return ok(res, { id: admin.id, name: admin.name, email: admin.email, role: admin.role }, 'Signed in successfully');
+  setAuthCookies(res, accessToken, refreshToken);
+  return ok(
+    res,
+    { id: admin.id, name: admin.name, email: admin.email, role: admin.role, token: accessToken },
+    'Signed in successfully'
+  );
 });
 
 authRouter.post('/refresh', async (req, res) => {
@@ -49,10 +54,17 @@ authRouter.post('/refresh', async (req, res) => {
       clearAuthCookies(res);
       return fail(res, 'Refresh session expired', 401);
     }
+    const nextAccess = createAccessToken(session.admin);
     const nextRefresh = createRefreshToken(session.admin, session.id);
     await prisma.adminSession.update({ where: { id: session.id }, data: { refreshTokenHash: hashToken(nextRefresh) } });
-    setAuthCookies(res, createAccessToken(session.admin), nextRefresh);
-    return ok(res, { id: session.admin.id, name: session.admin.name, email: session.admin.email, role: session.admin.role });
+    setAuthCookies(res, nextAccess, nextRefresh);
+    return ok(res, {
+      id: session.admin.id,
+      name: session.admin.name,
+      email: session.admin.email,
+      role: session.admin.role,
+      token: nextAccess,
+    });
   } catch {
     clearAuthCookies(res);
     return fail(res, 'Refresh session expired', 401);

@@ -1,0 +1,39 @@
+services:
+  # AuraStore API Backend Service
+  - type: web
+    name: aurastore-api
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run prisma:generate && npm run build:server
+    startCommand: npm start
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: SERVER_ENV
+        value: production
+      - key: CLIENT_URL
+        value: https://aurastore-web.onrender.com
+      - key: ADMIN_EMAIL
+        value: admin@aurastore.com
+      - key: ADMIN_PASSWORD
+        value: AuraStoreAdmin2026!
+      - key: ADMIN_NAME
+        value: AuraStore Administrator
+
+  # AuraStore Storefront Frontend (Static Site)
+  - type: web
+    name: aurastore-web
+    runtime: static
+    buildCommand: npm install && npm run prisma:generate && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: https://aurastore-api.onrender.com

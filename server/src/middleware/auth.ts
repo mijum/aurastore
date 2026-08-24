@@ -6,7 +6,9 @@ import type { AdminClaims } from '../types.js';
 import { fail } from '../utils.js';
 
 export const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.cookies?.aura_admin_access;
+  const header = req.headers?.authorization;
+  const bearerToken = header && header.startsWith('Bearer ') ? header.slice(7).trim() : undefined;
+  const token = req.cookies?.aura_admin_access || bearerToken;
   if (!token) return fail(res, 'Administrator authentication required', 401);
   try {
     const claims = jwt.verify(token, env.JWT_ACCESS_SECRET) as AdminClaims;

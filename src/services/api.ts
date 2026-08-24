@@ -16,17 +16,45 @@ export class ApiError extends Error {
 
 const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 
+let authToken = typeof window !== 'undefined' ? localStorage.getItem('aura_admin_token') || '' : '';
+
+export const setAuthToken = (token: string | null) => {
+  authToken = token || '';
+  if (typeof window !== 'undefined') {
+    if (token) {
+      localStorage.setItem('aura_admin_token', token);
+    } else {
+      localStorage.removeItem('aura_admin_token');
+    }
+  }
+};
+
+export const getAuthToken = () => authToken;
+
 async function request<T>(path: string, init: RequestInit = {}, retry = true): Promise<T> {
   const isForm = init.body instanceof FormData;
+  const authHeaders: Record<string, string> = {};
+  if (authToken && path.startsWith('/api/admin/')) {
+    authHeaders['Authorization'] = `Bearer ${authToken}`;
+  }
+
   const response = await fetch(`${API_URL}${path}`, {
     ...init,
     credentials: 'include',
-    headers: { ...(isForm ? {} : { 'Content-Type': 'application/json' }), ...init.headers },
+    headers: { ...(isForm ? {} : { 'Content-Type': 'application/json' }), ...authHeaders, ...init.headers },
   });
 
   if (response.status === 401 && retry && path.startsWith('/api/admin/') && !path.includes('/auth/')) {
-    const refreshed = await fetch(`${API_URL}/api/admin/auth/refresh`, { method: 'POST', credentials: 'include' });
-    if (refreshed.ok) return request<T>(path, init, false);
+    const refreshed = await fetch(`${API_URL}/api/admin/auth/refresh`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: authHeaders,
+    });
+    if (refreshed.ok) {
+      const data = (await refreshed.json().catch(() => null)) as ApiEnvelope<{ token?: string }>;
+      if (data?.data?.token) setAuthToken(data.data.token);
+      return request<T>(path, init, false);
+    }
   }
 
   const payload = await response.json().catch(() => ({ success: false, message: 'The server returned an invalid response' })) as ApiEnvelope<T>;
@@ -67,9 +95,19 @@ export const publicApi = {
 };
 
 export const adminApi = {
-  login: (email: string, password: string) => request<any>('/api/admin/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
+  login: async (email: string, password: string) => {
+    const data = await request<any>('/api/admin/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+    if (data?.token) setAuthToken(data.token);
+    return data;
+  },
   me: () => request<any>('/api/admin/auth/me'),
-  logout: () => request<void>('/api/admin/auth/logout', { method: 'POST' }),
+  logout: async () => {
+    try {
+      await request<void>('/api/admin/auth/logout', { method: 'POST' });
+    } finally {
+      setAuthToken(null);
+    }
+  },
   dashboard: () => request<any>('/api/admin/dashboard'),
   products: (params: Record<string, string | number | boolean | undefined> = {}) => request<any>(`/api/admin/products${query(params)}`),
   product: (id: string) => request<any>(`/api/admin/products/${id}`),

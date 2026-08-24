@@ -64,16 +64,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     return (
       <div className="group bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 hover:border-indigo-300 hover:shadow-lg transition-all flex flex-col sm:flex-row gap-5">
         {/* Image */}
-        <div className="relative w-full sm:w-52 aspect-square sm:aspect-auto rounded-xl overflow-hidden bg-slate-100 shrink-0">
-          <Link to={`/product/${product.slug}`}>
-            <img
-              ref={productImageRef}
-              src={imageError ? fallbackImage : product.images[0]}
-              alt={product.name}
-              onError={() => setImageError(true)}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-          </Link>
+        <div 
+          onClick={() => openQuickView(product)}
+          className="relative w-full sm:w-52 aspect-square sm:aspect-auto rounded-xl overflow-hidden bg-slate-100 shrink-0 cursor-pointer"
+        >
+          <img
+            ref={productImageRef}
+            src={imageError ? fallbackImage : product.images[0]}
+            alt={product.name}
+            onError={() => setImageError(true)}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
           {/* Badges */}
           <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5 z-10">
             {discountPercentage > 0 && (
@@ -108,12 +109,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               </button>
             </div>
 
-            <Link
-              to={`/product/${product.slug}`}
-              className="text-base sm:text-lg font-bold text-slate-900 hover:text-indigo-600 transition-colors line-clamp-1"
+            <button
+              onClick={() => openQuickView(product)}
+              className="text-left text-base sm:text-lg font-bold text-slate-900 hover:text-indigo-600 transition-colors line-clamp-1 cursor-pointer"
             >
               {product.name}
-            </Link>
+            </button>
 
             <p className="text-xs sm:text-sm text-slate-500 line-clamp-2 mt-1.5 mb-3 leading-relaxed">
               {product.description}
@@ -144,7 +145,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             <div className="flex items-center gap-2">
               <button
                 onClick={handleQuickView}
-                className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-colors flex items-center gap-1.5"
+                className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer"
                 title="Quick preview"
               >
                 <Eye className="w-3.5 h-3.5" />
@@ -158,7 +159,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                     ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
                     : justAdded
                     ? 'bg-emerald-600 text-white'
-                    : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-600/20'
+                    : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-600/20 cursor-pointer'
                 }`}
               >
                 {justAdded ? (
@@ -188,16 +189,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Image Container */}
-      <div className="relative w-full aspect-[4/5] rounded-xl overflow-hidden bg-slate-100 mb-3.5">
-        <Link to={`/product/${product.slug}`} className="block w-full h-full">
-          <img
-            ref={productImageRef}
-            src={imageError ? fallbackImage : product.images[0]}
-            alt={product.name}
-            onError={() => setImageError(true)}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-          />
-        </Link>
+      <div 
+        onClick={() => openQuickView(product)}
+        className="relative w-full aspect-[4/5] rounded-xl overflow-hidden bg-slate-100 mb-3.5 cursor-pointer"
+      >
+        <img
+          ref={productImageRef}
+          src={imageError ? fallbackImage : product.images[0]}
+          alt={product.name}
+          onError={() => setImageError(true)}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+        />
 
         {/* Badges */}
         <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5 z-10">
@@ -233,7 +235,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         >
           <button
             onClick={handleQuickView}
-            className="w-full py-2 px-3 bg-white/95 hover:bg-white text-slate-800 text-xs font-bold rounded-xl shadow-lg backdrop-blur-md transition-all flex items-center justify-center gap-1.5 hover:text-indigo-600"
+            className="w-full py-2 px-3 bg-white/95 hover:bg-white text-slate-800 text-xs font-bold rounded-xl shadow-lg backdrop-blur-md transition-all flex items-center justify-center gap-1.5 hover:text-indigo-600 cursor-pointer"
           >
             <Eye className="w-3.5 h-3.5" /> Quick View
           </button>
@@ -253,12 +255,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           )}
         </div>
 
-        <Link
-          to={`/product/${product.slug}`}
-          className="text-sm font-bold text-slate-900 hover:text-indigo-600 transition-colors line-clamp-1 mb-1.5"
+        <button
+          onClick={() => openQuickView(product)}
+          className="text-left text-sm font-bold text-slate-900 hover:text-indigo-600 transition-colors line-clamp-1 mb-1.5 cursor-pointer"
         >
           {product.name}
-        </Link>
+        </button>
 
         <div className="mb-3">
           <RatingStars rating={product.rating} reviewCount={product.reviewCount} showScore />

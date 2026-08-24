@@ -178,6 +178,11 @@ export const Footer: React.FC = () => {
                   New Arrivals
                 </Link>
               </li>
+              <li>
+                <Link to="/admin/login" className="text-slate-400 hover:text-indigo-400 transition-colors flex items-center gap-1.5 font-medium">
+                  <span>Admin Portal</span>
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -219,8 +224,12 @@ export const Footer: React.FC = () => {
 
         {/* Bottom Bar & Payment badges */}
         <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <div>
-            © {new Date().getFullYear()} AuraStore Inc. All rights reserved. Designed for Bangladesh.
+          <div className="flex flex-wrap items-center gap-3">
+            <span>© {new Date().getFullYear()} AuraStore Inc. All rights reserved. Designed for Bangladesh.</span>
+            <span className="text-slate-700">•</span>
+            <Link to="/admin/login" className="text-slate-500 hover:text-indigo-400 transition-colors">
+              Staff Portal
+            </Link>
           </div>
 
           {/* Payment & Currency Badges */}

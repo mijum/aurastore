@@ -31,14 +31,18 @@ export const createRefreshToken = (
   );
 
 export const setAuthCookies = (res: Response, accessToken: string, refreshToken: string) => {
-  const base = { httpOnly: true, secure: isProduction, sameSite: 'lax' as const, path: '/' };
+  const sameSite = isProduction ? ('none' as const) : ('lax' as const);
+  const secure = isProduction;
+  const base = { httpOnly: true, secure, sameSite, path: '/' };
   res.cookie('aura_admin_access', accessToken, { ...base, maxAge: 15 * 60 * 1000 });
   res.cookie('aura_admin_refresh', refreshToken, { ...base, maxAge: 7 * 24 * 60 * 60 * 1000 });
 };
 
 export const clearAuthCookies = (res: Response) => {
-  res.clearCookie('aura_admin_access', { path: '/' });
-  res.clearCookie('aura_admin_refresh', { path: '/' });
+  const sameSite = isProduction ? ('none' as const) : ('lax' as const);
+  const secure = isProduction;
+  res.clearCookie('aura_admin_access', { path: '/', sameSite, secure });
+  res.clearCookie('aura_admin_refresh', { path: '/', sameSite, secure });
 };
 
 type ProductWithRelations = {
