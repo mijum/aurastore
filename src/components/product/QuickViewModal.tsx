@@ -32,6 +32,23 @@ export const QuickViewModal: React.FC = () => {
     }
   }, [product]);
 
+  // Escape key closes modal & freeze body scroll
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeQuickView();
+      }
+    };
+    if (product) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [product, closeQuickView]);
+
   if (!product) return null;
 
   const inWishlist = isInWishlist(product.id);
@@ -54,25 +71,39 @@ export const QuickViewModal: React.FC = () => {
 
   return (
     <div
-      className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 animate-fade-in"
-      onClick={closeQuickView}
+      className="fixed inset-0 z-50 cart-water-overlay"
       role="dialog"
       aria-modal="true"
+      aria-labelledby="quickview-title"
     >
+      {/* Backdrop */}
       <div
-        className="bg-white w-full max-w-3xl rounded-3xl shadow-2xl border border-slate-200/80 overflow-hidden transform transition-all animate-slide-up relative"
+        className="fixed inset-0 bg-slate-950/65 backdrop-blur-md cart-water-backdrop"
+        onClick={closeQuickView}
+      />
+
+      {/* Water Ripples */}
+      <div className="cart-water-ripples" aria-hidden="true">
+        <span />
+        <span />
+        <span />
+      </div>
+
+      {/* Centered Modal with blooming water animation */}
+      <div
+        className="cart-water-modal fixed left-1/2 top-1/2 w-[calc(100%-2rem)] max-w-3xl max-h-[min(90vh,780px)] bg-white shadow-2xl flex flex-col z-10 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={closeQuickView}
-          className="absolute top-4 right-4 z-20 w-9 h-9 flex items-center justify-center rounded-full bg-white/90 hover:bg-slate-100 text-slate-400 hover:text-slate-700 shadow-md transition-colors"
+          className="absolute top-4 right-4 z-20 w-9 h-9 flex items-center justify-center rounded-xl bg-white/90 hover:bg-slate-100 text-slate-400 hover:text-slate-700 shadow-md transition-colors"
           aria-label="Close modal"
         >
           <X className="w-5 h-5" />
         </button>
 
-        <div className="grid grid-cols-1 md:grid-cols-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 overflow-y-auto flex-1">
           {/* Gallery */}
           <div className="p-6 bg-slate-50 flex flex-col justify-between">
             <div className="aspect-[4/5] rounded-2xl overflow-hidden bg-white shadow-inner mb-3">
@@ -124,7 +155,7 @@ export const QuickViewModal: React.FC = () => {
                 </button>
               </div>
 
-              <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 mb-2">
+              <h2 id="quickview-title" className="text-xl sm:text-2xl font-extrabold text-slate-900 mb-2">
                 {product.name}
               </h2>
 
