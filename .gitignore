@@ -1,0 +1,10 @@
+.env
+.env.*
+!.env.example
+.local/
+node_modules/
+dist/
+server-dist/
+uploads/*
+!uploads/.gitkeep
+
