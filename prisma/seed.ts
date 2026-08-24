@@ -105,7 +105,6 @@ async function seed() {
   const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
   const adminPassword = process.env.ADMIN_PASSWORD;
   if (adminEmail && adminPassword) {
-    if (adminPassword.length < 12) throw new Error('ADMIN_PASSWORD must be at least 12 characters');
     const passwordHash = await bcrypt.hash(adminPassword, 12);
     await prisma.adminUser.upsert({
       where: { email: adminEmail },

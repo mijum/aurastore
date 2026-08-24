@@ -17,13 +17,18 @@ import {
 } from '../utils.js';
 
 export const authRouter = Router();
-const credentialsSchema = z.object({ email: z.string().email(), password: z.string().min(8) });
+const credentialsSchema = z.object({ email: z.string().min(1), password: z.string().min(1) });
 
 authRouter.post('/login', async (req, res) => {
   const parsed = credentialsSchema.safeParse(req.body);
-  if (!parsed.success) return fail(res, 'Valid email and password are required', 422);
-  const email = parsed.data.email.trim().toLowerCase();
-  const admin = await prisma.adminUser.findUnique({ where: { email } });
+  if (!parsed.success) return fail(res, 'Valid username or email and password are required', 422);
+  const input = parsed.data.email.trim().toLowerCase();
+  const emailToFind = input === 'admin' ? 'admin@aurastore.com' : input;
+  const admin = await prisma.adminUser.findFirst({
+    where: {
+      OR: [{ email: input }, { email: emailToFind }],
+    },
+  });
   if (!admin || !admin.active || !(await bcrypt.compare(parsed.data.password, admin.passwordHash))) {
     return fail(res, 'Invalid administrator credentials', 401);
   }
