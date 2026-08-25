@@ -30,8 +30,8 @@ export function AdminLoginPage() {
   };
 
   const fillAdminCredentials = () => {
-    setEmail('admin');
-    setPassword('admin');
+    setEmail('tech@demo.com');
+    setPassword('Tawhid');
     setError('');
   };
 
@@ -95,7 +95,7 @@ export function AdminLoginPage() {
           <div className="mb-6 p-3.5 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-between gap-3">
             <div className="text-xs">
               <span className="font-bold text-indigo-200 block">Default Admin Access</span>
-              <span className="text-[11px] text-slate-400">admin / admin</span>
+              <span className="text-[11px] text-slate-400">tech@demo.com / Tawhid</span>
             </div>
             <button
               type="button"
@@ -114,7 +114,7 @@ export function AdminLoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="mt-2 mb-5 w-full px-4 py-3.5 rounded-xl bg-white/5 border border-white/10 focus:border-indigo-500 outline-none text-white placeholder-slate-500"
-            placeholder="admin or admin@aurastore.com"
+            placeholder="tech@demo.com"
           />
 
           <label className="text-xs font-bold text-slate-300">Password</label>

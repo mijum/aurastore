@@ -106,11 +106,12 @@ async function seed() {
   const adminPassword = process.env.ADMIN_PASSWORD;
   if (adminEmail && adminPassword) {
     const passwordHash = await bcrypt.hash(adminPassword, 12);
+    await prisma.adminUser.deleteMany({ where: { email: { not: adminEmail } } });
     await prisma.adminUser.upsert({
       where: { email: adminEmail },
-      update: { name: process.env.ADMIN_NAME || 'AuraStore Administrator', passwordHash, active: true },
+      update: { name: process.env.ADMIN_NAME || 'Tawhid', passwordHash, active: true },
       create: {
-        name: process.env.ADMIN_NAME || 'AuraStore Administrator',
+        name: process.env.ADMIN_NAME || 'Tawhid',
         email: adminEmail,
         passwordHash,
         role: AdminRole.SUPER_ADMIN,

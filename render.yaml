@@ -18,11 +18,11 @@ services:
       - key: CLIENT_URL
         value: https://aurastore-web.onrender.com
       - key: ADMIN_EMAIL
-        value: admin@aurastore.com
+        value: tech@demo.com
       - key: ADMIN_PASSWORD
-        value: AuraStoreAdmin2026!
+        value: Tawhid
       - key: ADMIN_NAME
-        value: AuraStore Administrator
+        value: Tawhid
 
   # AuraStore Storefront Frontend (Static Site)
   - type: web
