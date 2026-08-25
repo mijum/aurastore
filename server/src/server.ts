@@ -22,10 +22,10 @@ const allowedOrigins = [env.CLIENT_URL, 'http://localhost:5173'].filter(Boolean)
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.onrender.com')) {
+      if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
-      return callback(null, true);
+      return callback(new Error('Origin not allowed by CORS'));
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
@@ -49,7 +49,7 @@ app.use('/api', (_req, res) => fail(res, 'API route not found', 404));
 const distPath = path.resolve('dist');
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
-  app.get('*', (_req, res) => {
+  app.get('{*splat}', (_req, res) => {
     res.sendFile(path.join(distPath, 'index.html'));
   });
 }
