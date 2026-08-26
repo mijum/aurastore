@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
-import { Sparkles, Mail, Lock, ArrowRight, UserCheck, AlertCircle } from 'lucide-react';
+import { Sparkles, Mail, Lock, ArrowRight, AlertCircle } from 'lucide-react';
 import { Modal } from '../components/common/Modal';
 
 export const LoginPage: React.FC = () => {
@@ -42,13 +42,6 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const fillDemoAccount = () => {
-    setEmail('demo@aurastore.com');
-    setPassword('password123');
-    setErrorMsg('');
-    addToast('Demo credentials inserted!', 'info');
-  };
-
   const handleResetPassword = (e: React.FormEvent) => {
     e.preventDefault();
     if (!resetEmail.trim()) {
@@ -73,22 +66,6 @@ export const LoginPage: React.FC = () => {
           <p className="text-xs text-slate-500">
             Access your orders, saved addresses, and wishlist
           </p>
-        </div>
-
-        {/* 1-Click Demo Login Box */}
-        <div className="p-4 bg-indigo-50/80 rounded-2xl border border-indigo-100 flex items-center justify-between gap-3">
-          <div className="text-xs">
-            <span className="font-bold text-indigo-950 block">Quick Demo Login</span>
-            <span className="text-[11px] text-indigo-700">demo@aurastore.com</span>
-          </div>
-          <button
-            type="button"
-            onClick={fillDemoAccount}
-            className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm transition-colors flex items-center gap-1 shrink-0"
-          >
-            <UserCheck className="w-3.5 h-3.5" />
-            1-Click Auto Fill
-          </button>
         </div>
 
         {errorMsg && (

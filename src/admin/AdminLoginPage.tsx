@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { ArrowRight, Eye, EyeOff, LockKeyhole, ShieldCheck, Store, UserCheck } from 'lucide-react';
+import { ArrowRight, Eye, EyeOff, LockKeyhole, ShieldCheck, Store } from 'lucide-react';
 import { useAdmin } from './AdminContext';
 
 export function AdminLoginPage() {
@@ -27,12 +27,6 @@ export function AdminLoginPage() {
     } finally {
       setBusy(false);
     }
-  };
-
-  const fillAdminCredentials = () => {
-    setEmail('tech@demo.com');
-    setPassword('Tawhid');
-    setError('');
   };
 
   return (
@@ -90,22 +84,6 @@ export function AdminLoginPage() {
           <p className="text-slate-400 mt-2 mb-6">
             Sign in with your administrator username/email and password.
           </p>
-
-          {/* Quick Demo Autofill Banner */}
-          <div className="mb-6 p-3.5 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-between gap-3">
-            <div className="text-xs">
-              <span className="font-bold text-indigo-200 block">Default Admin Access</span>
-              <span className="text-[11px] text-slate-400">tech@demo.com / Tawhid</span>
-            </div>
-            <button
-              type="button"
-              onClick={fillAdminCredentials}
-              className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer shadow-lg shadow-indigo-950"
-            >
-              <UserCheck className="w-3.5 h-3.5" />
-              1-Click Auto Fill
-            </button>
-          </div>
 
           <label className="text-xs font-bold text-slate-300">Username or Email</label>
           <input

@@ -35,7 +35,7 @@ const upload = multer({
 });
 
 adminRouter.get('/dashboard', async (_req, res) => {
-  const [orderStats, totalProducts, totalCustomers, pendingOrders, processingOrders, inventories, recentOrders, topItems] = await prisma.$transaction([
+  const [orderStats, totalProducts, totalCustomers, pendingOrders, processingOrders, inventories, recentOrders, topItems] = await Promise.all([
     prisma.order.aggregate({ _sum: { total: true }, _count: true, where: { status: { notIn: ['CANCELLED', 'REFUNDED'] } } }),
     prisma.product.count({ where: { status: { not: ProductStatus.ARCHIVED } } }),
     prisma.customer.count(),
@@ -73,7 +73,7 @@ adminRouter.get('/products', async (req, res) => {
   };
   const sort = String(req.query.sort || 'newest');
   const orderBy: Prisma.ProductOrderByWithRelationInput = sort === 'oldest' ? { createdAt: 'asc' } : sort === 'price_asc' ? { price: 'asc' } : sort === 'price_desc' ? { price: 'desc' } : sort === 'name' ? { name: 'asc' } : { createdAt: 'desc' };
-  const [items, total] = await prisma.$transaction([
+  const [items, total] = await Promise.all([
     prisma.product.findMany({ where, include: productInclude, orderBy, skip: (pagination.page - 1) * pagination.limit, take: pagination.limit }),
     prisma.product.count({ where }),
   ]);
@@ -215,7 +215,7 @@ adminRouter.get('/orders', async (req, res) => {
     ...(search ? { OR: [{ orderNumber: { contains: search, mode: 'insensitive' } }, { customerName: { contains: search, mode: 'insensitive' } }, { customerEmail: { contains: search, mode: 'insensitive' } }] } : {}),
     ...(status ? { status: status as never } : {}),
   };
-  const [items, total] = await prisma.$transaction([
+  const [items, total] = await Promise.all([
     prisma.order.findMany({ where, include: { _count: { select: { items: true } } }, orderBy: { createdAt: req.query.sort === 'oldest' ? 'asc' : 'desc' }, skip: (pagination.page - 1) * pagination.limit, take: pagination.limit }),
     prisma.order.count({ where }),
   ]);
@@ -239,7 +239,7 @@ adminRouter.get('/customers', async (req, res) => {
   const pagination = paginationSchema.parse(req.query);
   const search = String(req.query.search || '').trim();
   const where: Prisma.CustomerWhereInput = search ? { OR: [{ name: { contains: search, mode: 'insensitive' } }, { email: { contains: search, mode: 'insensitive' } }, { phone: { contains: search } }] } : {};
-  const [customers, total] = await prisma.$transaction([
+  const [customers, total] = await Promise.all([
     prisma.customer.findMany({ where, include: { orders: { select: { id: true, total: true, createdAt: true, status: true }, orderBy: { createdAt: 'desc' } } }, orderBy: { createdAt: 'desc' }, skip: (pagination.page - 1) * pagination.limit, take: pagination.limit }),
     prisma.customer.count({ where }),
   ]);

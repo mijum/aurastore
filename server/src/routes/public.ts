@@ -42,7 +42,7 @@ publicRouter.get('/products', async (req, res) => {
     sort === 'newest' ? { createdAt: 'desc' } :
     sort === 'rating' ? { rating: 'desc' } : { featured: 'desc' };
 
-  const [items, total] = await prisma.$transaction([
+  const [items, total] = await Promise.all([
     prisma.product.findMany({
       where,
       include: productInclude,
