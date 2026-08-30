@@ -1,4 +1,4 @@
-import path from 'node:path';
+﻿import path from 'node:path';
 import fs from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { Router } from 'express';
@@ -277,3 +277,4 @@ adminRouter.put('/shipping-settings', async (req, res) => {
   });
   return ok(res, shippingSettingsDto(settings), 'Shipping settings updated successfully');
 });
+

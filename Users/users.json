@@ -1,0 +1,90 @@
+﻿{
+  "_info": "AuraStore Registered Users Data Store",
+  "_lastExported": null,
+  "_note": "This file is a static snapshot. Live data is stored in localStorage (key: aurastore_accounts). Use the admin Users page to export an updated version.",
+  "users": [
+    {
+      "id": "user-demo-1",
+      "name": "Tawhid Namikaze",
+      "email": "demo@aurastore.com",
+      "phone": "01712345678",
+      "role": "VIP",
+      "status": "ACTIVE",
+      "joinedDate": "2026-01-15",
+      "isDemoUser": true,
+      "orderCount": 5,
+      "totalSpent": 14750,
+      "lastOrderDate": "2026-08-10"
+    },
+    {
+      "id": "user-2",
+      "name": "Ayesha Rahman",
+      "email": "ayesha.rahman@gmail.com",
+      "phone": "01812345679",
+      "role": "CUSTOMER",
+      "status": "ACTIVE",
+      "joinedDate": "2026-02-03",
+      "orderCount": 3,
+      "totalSpent": 8900,
+      "lastOrderDate": "2026-07-22"
+    },
+    {
+      "id": "user-3",
+      "name": "Mahir Chowdhury",
+      "email": "mahir.c@yahoo.com",
+      "phone": "01912345680",
+      "role": "CUSTOMER",
+      "status": "ACTIVE",
+      "joinedDate": "2026-03-18",
+      "orderCount": 1,
+      "totalSpent": 2499,
+      "lastOrderDate": "2026-06-01"
+    },
+    {
+      "id": "user-4",
+      "name": "Nusrat Jahan",
+      "email": "nusrat.jahan@outlook.com",
+      "phone": "01612345681",
+      "role": "VIP",
+      "status": "ACTIVE",
+      "joinedDate": "2026-01-28",
+      "orderCount": 8,
+      "totalSpent": 32400,
+      "lastOrderDate": "2026-08-20"
+    },
+    {
+      "id": "user-5",
+      "name": "Rakib Hassan",
+      "email": "rakib.h@hotmail.com",
+      "phone": "01512345682",
+      "role": "CUSTOMER",
+      "status": "BLOCKED",
+      "joinedDate": "2026-04-05",
+      "orderCount": 0,
+      "totalSpent": 0
+    },
+    {
+      "id": "user-6",
+      "name": "Sadia Islam",
+      "email": "sadia.islam88@gmail.com",
+      "phone": "01712345683",
+      "role": "WHOLESALER",
+      "status": "ACTIVE",
+      "joinedDate": "2026-02-20",
+      "orderCount": 15,
+      "totalSpent": 87600,
+      "lastOrderDate": "2026-08-25"
+    },
+    {
+      "id": "user-7",
+      "name": "Farhan Ahmed",
+      "email": "farhan.ahmed@gmail.com",
+      "phone": "01812345684",
+      "role": "CUSTOMER",
+      "status": "PENDING",
+      "joinedDate": "2026-08-28",
+      "orderCount": 0,
+      "totalSpent": 0
+    }
+  ]
+}

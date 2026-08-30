@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useMemo, useRef, ReactNode } from 'react';
+﻿import React, { createContext, useContext, useState, useEffect, useMemo, useRef, ReactNode } from 'react';
 import {
   Product,
   CartItem,
@@ -568,7 +568,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       const localCoupon = VALID_COUPONS.find((c) => c.code.toUpperCase() === cleanCode);
       if (localCoupon) {
         if (localCoupon.minSpend && cartSubtotal < localCoupon.minSpend) {
-          return { success: false, message: `Minimum spend of ৳${localCoupon.minSpend} required.` };
+          return { success: false, message: `Minimum spend of à§³${localCoupon.minSpend} required.` };
         }
         setAppliedCoupon(localCoupon);
         addToast(`Coupon "${cleanCode}" applied successfully!`, 'success');
@@ -1024,3 +1024,4 @@ export const useStore = () => {
   }
   return context;
 };
+

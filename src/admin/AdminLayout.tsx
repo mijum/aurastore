@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { BarChart3, Boxes, ChevronRight, ClipboardList, FolderTree, LayoutDashboard, LogOut, Menu, PackageSearch, Settings, ShoppingBag, Store, Tags, Users, X } from 'lucide-react';
+import { BarChart3, Boxes, ChevronRight, ClipboardList, FolderTree, LayoutDashboard, LogOut, Menu, PackageSearch, Settings, ShoppingBag, Store, Tags, UserCheck, Users, X } from 'lucide-react';
 import { useAdmin } from './AdminContext';
 
 const links = [
@@ -9,6 +9,7 @@ const links = [
   { to: '/admin/categories', label: 'Categories', icon: FolderTree },
   { to: '/admin/orders', label: 'Orders', icon: ClipboardList },
   { to: '/admin/customers', label: 'Customers', icon: Users },
+  { to: '/admin/users', label: 'Users', icon: UserCheck },
   { to: '/admin/inventory', label: 'Inventory', icon: Boxes },
   { to: '/admin/coupons', label: 'Coupons', icon: Tags },
   { to: '/admin/settings', label: 'Settings', icon: Settings },
@@ -63,3 +64,4 @@ export function AdminLayout() {
 export function PageTitle({ title, description, action }: { title: string; description: string; action?: React.ReactNode }) {
   return <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-7"><div><div className="flex items-center gap-2 text-xs text-indigo-600 font-bold mb-2"><BarChart3 className="w-3.5 h-3.5" />AuraStore operations<ChevronRight className="w-3 h-3" /></div><h2 className="text-2xl sm:text-3xl font-black tracking-tight">{title}</h2><p className="text-sm text-slate-500 mt-1">{description}</p></div>{action}</div>;
 }
+

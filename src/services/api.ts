@@ -1,4 +1,4 @@
-import type { DeliveryMethod, Order, PaymentMethod, Product, ShippingSettings } from '../types';
+﻿import type { DeliveryMethod, Order, PaymentMethod, Product, ShippingSettings } from '../types';
 
 type ApiEnvelope<T> = { success: boolean; data: T; message: string; details?: unknown };
 
@@ -136,4 +136,13 @@ export const adminApi = {
   deleteCoupon: (id: string) => request<void>(`/api/admin/coupons/${id}`, { method: 'DELETE' }),
   shippingSettings: () => request<ShippingSettings>('/api/admin/shipping-settings'),
   updateShippingSettings: (data: ShippingSettings) => request<ShippingSettings>('/api/admin/shipping-settings', { method: 'PUT', body: JSON.stringify(data) }),
+  // User management endpoints (admin)
+  users: (params: Record<string, string | number | boolean | undefined> = {}) => request<any>('/api/admin/users' + query(params)),
+  createUser: (data: unknown) => request<any>('/api/admin/users', { method: 'POST', body: JSON.stringify(data) }),
+  updateUser: (id: string, data: unknown) => request<any>('/api/admin/users/' + id, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteUser: (id: string) => request<void>('/api/admin/users/' + id, { method: 'DELETE' }),
+  toggleUserStatus: (id: string) => request<any>('/api/admin/users/' + id + '/toggle-status', { method: 'PATCH' }),
 };
+
+
+

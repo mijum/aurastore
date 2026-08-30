@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+﻿import React, { useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { ToastContainer } from './components/common/ToastContainer';
@@ -33,6 +33,7 @@ const CustomersPage = React.lazy(() => import('./admin/AdminPages').then((module
 const InventoryPage = React.lazy(() => import('./admin/AdminPages').then((module) => ({ default: module.InventoryPage })));
 const CouponsPage = React.lazy(() => import('./admin/AdminPages').then((module) => ({ default: module.CouponsPage })));
 const SettingsPage = React.lazy(() => import('./admin/AdminPages').then((module) => ({ default: module.SettingsPage })));
+const UsersPage = React.lazy(() => import('./Users/UsersPage').then((module) => ({ default: module.UsersPage })));
 
 // Scroll to top helper on route change
 function ScrollToTop() {
@@ -65,6 +66,7 @@ export function App() {
               <Route path="orders" element={<OrdersPage />} />
               <Route path="orders/:id" element={<OrderDetailPage />} />
               <Route path="customers" element={<CustomersPage />} />
+              <Route path="users" element={<UsersPage />} />
               <Route path="inventory" element={<InventoryPage />} />
               <Route path="coupons" element={<CouponsPage />} />
               <Route path="settings" element={<SettingsPage />} />
@@ -110,3 +112,4 @@ export function App() {
 }
 
 export default App;
+
