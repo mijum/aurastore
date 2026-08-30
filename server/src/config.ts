@@ -9,6 +9,9 @@ const schema = z.object({
   PORT: z.coerce.number().int().positive().default(3000),
   SERVER_ENV: z.enum(['development', 'test', 'production']).default('development'),
   UPLOAD_DIR: z.string().default('uploads'),
+  ADMIN_EMAIL: z.string().default('tech@demo.com'),
+  ADMIN_PASSWORD: z.string().default('Tawhid'),
+  ADMIN_NAME: z.string().default('Tawhid'),
 });
 
 export const env = schema.parse(process.env);

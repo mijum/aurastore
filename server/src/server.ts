@@ -12,6 +12,8 @@ import { requireAdmin } from './middleware/auth.js';
 import { adminRouter } from './routes/admin.js';
 import { authRouter } from './routes/auth.js';
 import { publicRouter } from './routes/public.js';
+import bcrypt from 'bcryptjs';
+import { AdminRole } from '../../generated/prisma/client.js';
 import { fail, ok } from './utils.js';
 
 const app = express();
@@ -60,7 +62,48 @@ app.use((error: unknown, _req: express.Request, res: express.Response, _next: ex
   return fail(res, 'An unexpected server error occurred', 500);
 });
 
-const server = app.listen(env.PORT, () => console.log(`AuraStore API listening on http://localhost:${env.PORT}`));
+async function syncAdminAccount() {
+  const adminEmail = (env.ADMIN_EMAIL || 'tech@demo.com').trim().toLowerCase();
+  const adminPassword = env.ADMIN_PASSWORD || 'Tawhid';
+  const adminName = env.ADMIN_NAME || 'Tawhid';
+
+  try {
+    const passwordHash = await bcrypt.hash(adminPassword, 12);
+    await prisma.adminUser.upsert({
+      where: { email: adminEmail },
+      update: { name: adminName, passwordHash, active: true },
+      create: {
+        name: adminName,
+        email: adminEmail,
+        passwordHash,
+        role: AdminRole.SUPER_ADMIN,
+        active: true,
+      },
+    });
+
+    if (adminEmail !== 'admin@aurastore.com') {
+      await prisma.adminUser.upsert({
+        where: { email: 'admin@aurastore.com' },
+        update: { passwordHash, active: true },
+        create: {
+          name: 'AuraStore Administrator',
+          email: 'admin@aurastore.com',
+          passwordHash,
+          role: AdminRole.SUPER_ADMIN,
+          active: true,
+        },
+      });
+    }
+    console.log(`[Auth] Administrator account synchronized for ${adminEmail}`);
+  } catch (err) {
+    console.error('[Auth] Notice: Could not sync admin credentials on startup:', err);
+  }
+}
+
+const server = app.listen(env.PORT, () => {
+  console.log(`AuraStore API listening on http://localhost:${env.PORT}`);
+  void syncAdminAccount();
+});
 const shutdown = async () => {
   server.close();
   await prisma.$disconnect();

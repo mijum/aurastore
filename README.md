@@ -1,97 +1,129 @@
 # AuraStore
 
-AuraStore is a full-stack e-commerce application with the original React storefront, a PostgreSQL/Prisma data layer, an Express API, transactional checkout, and a protected administration portal.
+AuraStore is a full-stack e-commerce application featuring a React storefront (Vite + Tailwind CSS), an Express TypeScript API, a PostgreSQL data layer powered by Prisma with connection pooling, and an administrative operations portal.
 
 ## Requirements
 
 - Node.js 20+
 - npm 10+
-- PostgreSQL 15+ (local, Docker, Neon, Supabase, or another PostgreSQL provider)
+- PostgreSQL 15+ (Local, Docker, Neon, Supabase, or any compatible PostgreSQL provider)
 
-## Setup
+## Quick Start
+
+### 1. Installation & Environment Configuration
 
 ```bash
 npm install
 copy .env.example .env
 ```
 
-Edit `.env` and provide a reachable PostgreSQL URL and strong secrets. JWT secrets must each be at least 32 characters. The seed creates the initial administrator only when both `ADMIN_EMAIL` and `ADMIN_PASSWORD` are present; the password must be at least 12 characters.
+Edit `.env` to configure your database connection and security credentials:
+
+```ini
+DATABASE_URL="postgresql://username:password@host/database?sslmode=require"
+JWT_ACCESS_SECRET="your-jwt-access-secret-at-least-32-chars"
+JWT_REFRESH_SECRET="your-jwt-refresh-secret-at-least-32-chars"
+CLIENT_URL="http://localhost:5173"
+PORT=3000
+SERVER_ENV="development"
+UPLOAD_DIR="uploads"
+ADMIN_EMAIL="admin@aurastore.com"
+ADMIN_PASSWORD="YourSecurePassword123!"
+ADMIN_NAME="AuraStore Administrator"
+```
+
+> **Note**: The database seed initializes the administrator account with the `ADMIN_EMAIL` and `ADMIN_PASSWORD` defined in `.env`.
+
+### 2. Database Migration & Seed
 
 ```bash
-npm run db:deploy
-npm run db:seed
+npm run db:deploy      # Apply Prisma migrations
+npm run db:seed        # Seed product catalog, categories, coupons, and initial admin account
+```
+
+### 3. Start Development Server
+
+```bash
 npm run dev
 ```
 
-`npm run dev` starts the API and Vite storefront together. You can also use `npm run dev:server` and `npm run dev:web` in separate terminals.
+`npm run dev` concurrently starts both:
+- **API Server**: Express backend on [http://localhost:3000](http://localhost:3000)
+- **Storefront / Admin**: Vite dev server on [http://localhost:5173](http://localhost:5173)
 
-## Environment variables
+You can also run them independently via `npm run dev:server` and `npm run dev:web`.
 
-| Variable | Purpose |
+---
+
+## Environment Variables
+
+| Variable | Description |
 | --- | --- |
-| `DATABASE_URL` | PostgreSQL connection string |
-| `JWT_ACCESS_SECRET` | Access-token signing secret (32+ characters) |
-| `JWT_REFRESH_SECRET` | Separate refresh-token signing secret (32+ characters) |
-| `ADMIN_EMAIL` | Initial seeded administrator email |
-| `ADMIN_PASSWORD` | Initial seeded administrator password (12+ characters) |
-| `ADMIN_NAME` | Initial administrator display name |
-| `CLIENT_URL` | Allowed browser origin, normally `http://localhost:5173` |
-| `PORT` | Express API port, normally `3000` |
-| `SERVER_ENV` | `development`, `test`, or `production` for the API |
-| `UPLOAD_DIR` | Local product-image directory |
-| `VITE_API_URL` | Optional API origin; blank uses the Vite proxy |
+| `DATABASE_URL` | PostgreSQL connection string (supports Neon, Supabase, and local Postgres) |
+| `JWT_ACCESS_SECRET` | Secret key for signing short-lived access tokens (min. 32 characters) |
+| `JWT_REFRESH_SECRET` | Secret key for signing rotating refresh tokens (min. 32 characters) |
+| `ADMIN_EMAIL` | Administrator login email / username |
+| `ADMIN_PASSWORD` | Administrator login password |
+| `ADMIN_NAME` | Administrator display name |
+| `CLIENT_URL` | Allowed CORS origin (typically `http://localhost:5173`) |
+| `PORT` | API server port (default: `3000`) |
+| `SERVER_ENV` | Environment mode (`development`, `test`, or `production`) |
+| `UPLOAD_DIR` | Directory for uploaded media and product imagery |
+| `VITE_API_URL` | Optional custom API base URL (empty defaults to Vite reverse proxy) |
 
-Never commit `.env` or real credentials.
+---
 
-## Database
+## Key Architecture & Features
 
-The initial migration is stored in `prisma/migrations`. Prisma models include:
+### 1. Database & Connection Pooling
+- **Prisma with `@prisma/adapter-pg`**: Configured with a dedicated `pg.Pool` instance in `server/src/db.ts` to manage connection limits, timeouts, and idle connections.
+- **Serverless Database Compatibility**: Optimized for cloud databases (such as Neon and Supabase) by preventing cold-start transaction timeouts.
+- **Concurrent Read Queries**: High-throughput read endpoints (dashboard metrics, product catalog, orders, and customer queries) utilize non-blocking `Promise.all` rather than wrapping read-only queries in serializable database transactions.
 
-- `AdminUser`, `AdminSession`
-- `Product`, `ProductImage`, `Category`
-- `Inventory`, `InventoryAdjustment`
-- `Customer`, `Address`
-- `Order`, `OrderItem`
-- `Coupon`
+### 2. Authentication & Authorization
+- **Clean Authentication**: All demo auto-fill banners have been removed from both Customer Sign In (`/login`) and Admin Sign In (`/admin/login`) in favor of direct credential authentication.
+- **Role-Based Access Control (RBAC)**: Support for `MANAGER` (read-only inspection), `ADMIN`, and `SUPER_ADMIN` roles.
+- **Secure Token Lifecycle**: HTTP-only cookie-based authentication with rotating refresh token sessions and SHA-256 session hashing. Passwords are encrypted with bcrypt (12 salt rounds).
+- **Security Middleware**: Helmet security headers, credentialed CORS, rate limiting on authentication routes, and Zod schema validation on incoming payloads.
 
-Useful commands:
+### 3. Storefront & Checkout Integrity
+- **Server-Side Price Validation**: Client submissions provide only item IDs, quantities, and chosen variants. The backend verifies real-time pricing, recalculates discounts and taxes, and locks stock.
+- **Transactional Order Placement**: Order creation and stock decrement execute within atomic transactions to prevent double-spending or overselling.
+- **Non-Destructive Archival**: Products referenced in historical orders are flagged as `ARCHIVED` rather than hard-deleted.
 
-```bash
-npm run db:migrate     # create/apply development migrations
-npm run db:deploy      # apply committed migrations
-npm run db:seed        # seed existing AuraStore catalog, coupons, and admin
-npm run db:studio      # inspect data visually
-npm run db:local:start # start the project-local Windows PostgreSQL installation
-npm run db:local:stop  # stop the project-local Windows PostgreSQL installation
-npm run prisma:generate
-```
+---
 
-The seed imports every product from the original storefront catalog, including images, prices, discounts, ratings, descriptions, variants, categories, and stock.
+## Application Routes
 
-## URLs
+| Endpoint | Destination |
+| --- | --- |
+| `http://localhost:5173/` | Customer Storefront |
+| `http://localhost:5173/shop` | Product Catalog with filtering & search |
+| `http://localhost:5173/login` | Customer Sign In |
+| `http://localhost:5173/admin/login` | Admin Operations Portal Sign In |
+| `http://localhost:5173/admin` | Admin Operations Dashboard |
+| `http://localhost:3000/api` | API Root |
+| `http://localhost:3000/api/health` | API & Database Health Check |
 
-- Storefront: `http://localhost:5173`
-- Admin login: `http://localhost:5173/admin/login`
-- Admin dashboard: `http://localhost:5173/admin`
-- API: `http://localhost:3000/api`
-- Health check: `http://localhost:3000/api/health`
+---
 
-Sign in with `ADMIN_EMAIL` and `ADMIN_PASSWORD` after seeding.
+## Available Scripts
 
-## Security and order integrity
+| Script | Purpose |
+| --- | --- |
+| `npm run dev` | Runs both Express API and Vite frontend concurrently with hot reload |
+| `npm run dev:server` | Runs Express API only (`tsx watch server/src/server.ts`) |
+| `npm run dev:web` | Runs Vite frontend development server |
+| `npm run db:deploy` | Applies pending Prisma migrations to the database |
+| `npm run db:migrate` | Generates and applies development database migrations |
+| `npm run db:seed` | Seeds reference categories, products, coupons, and admin credentials |
+| `npm run db:studio` | Launches Prisma Studio GUI for data inspection |
+| `npm run build` | Builds Prisma client, compiles server TypeScript, and bundles Vite assets |
+| `npm start` | Runs the compiled production server (`node server-dist/server/src/server.js`) |
 
-- Admin APIs require signed access cookies; refresh sessions are rotated and stored as hashes.
-- Passwords are hashed with bcrypt.
-- Manager accounts are read-only; `ADMIN` and `SUPER_ADMIN` can mutate store data.
-- Helmet, credentialed CORS, authentication rate limiting, Zod validation, and sanitized errors are enabled.
-- Checkout sends only product IDs, quantities, and variants. The API reloads current prices and stock, validates coupons, calculates totals, writes order snapshots, and decrements inventory in one serializable transaction.
-- Products used in previous orders are archived instead of breaking order history.
+---
 
-## Images
-
-Development uploads are validated and stored below `UPLOAD_DIR`, served at `/uploads`. Product images are separate database records, so replacing local storage with S3, Cloudinary, or another provider does not require changing the product/order model.
-
-## Production
+## Production Deployment
 
 ```bash
 npm run build
@@ -99,4 +131,5 @@ npm run db:deploy
 npm start
 ```
 
-The production server build is emitted to `server-dist`, and the storefront build to `dist`. Serve `dist` with your web host or CDN and point `VITE_API_URL` at the deployed API before building.
+The production server serves both the Express API and the compiled frontend bundle from `dist/` on the configured `PORT`.
+
